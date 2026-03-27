@@ -1,4 +1,4 @@
-const { addBooking, deleteBooking } = require("../src/booking");
+const { addBooking, deleteBooking, searchBookingByDate } = require("../src/booking");
 const { ServiceError, ValidationError } = require("../errors");
 
 function makeBooking() {
@@ -142,7 +142,7 @@ describe("Given i try to delete a booking", () => {
     });
 
     // Cas passants
-    test("When the booking id exist and reservation is in more than 48h", () => {
+    test("When the booking id exist and booking is in more than 48h", () => {
         const booking = makeBooking();
         const now = new Date();
         const startDate = new Date(now.getTime() + 49 * 60 * 60 * 1000);
@@ -153,6 +153,25 @@ describe("Given i try to delete a booking", () => {
         deleteBooking(1, booking.localStorage);
         expect(booking.localStorage.deleteBooking).toHaveBeenCalledWith(1);
     });
+})
 
-    // Cas bloquants
+describe("Given I try to search an booking by date" , () => {
+    // Cas non passants
+    test("When the date is not valid", () => {
+        const booking = makeBooking();
+        expect(() => searchBookingByDate("Pas une date", booking.localStorage)).toThrow(new ValidationError("Date is not valid"));
+    });
+
+    // Cas passants 
+    test("When the date is valid and there is a booking at this date", () => {
+        const booking = makeBooking();
+        const date = new Date("2024-06-02");
+        booking.localStorage.getBookings.mockReturnValue([
+            { id: 1, name: "réservation", startDate: "2024-06-01", endDate: "2024-06-03" }
+        ]);
+        const result = searchBookingByDate(date, booking.localStorage);
+        expect(result).toEqual([
+            { id: 1, name: "réservation", startDate: "2024-06-01", endDate: "2024-06-03" }
+        ]);
+    });
 })
