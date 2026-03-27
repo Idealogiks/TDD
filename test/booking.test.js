@@ -1,4 +1,4 @@
-const { addBooking } = require("../src/booking");
+const { addBooking, deleteBooking } = require("../src/booking");
 const { ServiceError, ValidationError } = require("../errors");
 
 function makeBooking() {

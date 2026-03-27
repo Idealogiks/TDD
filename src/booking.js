@@ -35,5 +35,23 @@ function addBooking(booking, localStorage){
     }
 }
 
+function deleteBooking(bookingId, localStorage) {
+    const existingBookings = localStorage.getBookings();
+    const ListBookings = existingBookings.findIndex(b => b.id === bookingId);
 
-module.exports = { addBooking };
+    if (ListBookings === -1) {
+        throw new ValidationError("Booking with this id does not exist");
+    }
+
+    const booking = existingBookings[ListBookings];
+    const now = new Date();
+    const startDate = new Date(booking.startDate);
+
+    if (startDate - now < 48 * 60 * 60 * 1000) {
+        throw new ValidationError("Cannot delete a booking that starts in less than 48h");
+    }
+
+    localStorage.deleteBooking(bookingId);
+}
+
+module.exports = { addBooking, deleteBooking };
