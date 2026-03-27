@@ -107,18 +107,18 @@ describe("Given i try to add a booking", () => {
     })
 
     // Cas bloquant 
-    /*
     test("When the localStorage doesn't respond ",() => {
         const booking = makeBooking();
-        booking.localStorage.addBooking.mockRejectedValue();
+        booking.localStorage.addBooking.mockImplementation(() => {
+            throw new Error("Storage unavailable");
+        });
         expect(() => addBooking({
-            id: 2,
-            name: "nouveau",
+            id: 1,
+            name: "ré²servation",
             startDate: "2024-06-02",
             endDate: "2024-06-03"
         }, booking.localStorage)).toThrow(new ServiceError("Localstorage doesn't respond"));   
-    })
-    */
+    });
 });
 
 describe("Given i try to delete a booking", () => {
