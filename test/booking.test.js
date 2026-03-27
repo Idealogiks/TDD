@@ -1,6 +1,5 @@
-import { jest } from "@jest/globals";
-import { addBooking } from "../src/booking";
-import { ServiceError, ValidationError } from "../errors";
+const { addBooking } = require("../src/booking");
+const { ServiceError, ValidationError } = require("../errors");
 
 function makeBooking() {
     return {
@@ -11,6 +10,16 @@ function makeBooking() {
 }
 
 describe("Given i try to add a booking", () => {
+    //Cas non passants
+    test("When the booking does not have an id", () => {
+        const booking = makeBooking();
+        expect(() => addBooking ({
+            name: "réservation", 
+            startDate: "2024-06-01", 
+            endDate: "2024-06-02"
+        }, booking.localStorage)).toThrow(new ValidationError("Booking must have an id"));
+    })
+
     test("When the booking does not have a name", () => {
         const booking = makeBooking();
         expect(() => addBooking({ 
@@ -35,7 +44,7 @@ describe("Given i try to add a booking", () => {
             id: 1, 
             name: "Réservation", 
             startDate: "2024-06-01"
-        }, booking.localStorage)).toThrow(new ValidationError("Booking must have a end date"));
+        }, booking.localStorage)).toThrow(new ValidationError("Booking must have an end date"));
     });
 
     test("When the end date is before the start date", () => {
@@ -61,4 +70,49 @@ describe("Given i try to add a booking", () => {
             endDate: "2024-06-04"
         }, booking.localStorage)).toThrow(new ValidationError("Booking conflicts with an existing booking"));
     });
+
+    //Cas passants 
+    test("When the booking is valid", () => {
+        const booking = makeBooking();
+        addBooking({ 
+            id: 1, 
+            name: "réservation", 
+            startDate: "2024-06-01", 
+            endDate: "2024-06-02"
+        }, booking.localStorage);
+        
+        expect(booking.localStorage.addBooking).toHaveBeenCalledWith({
+            id: 1,
+            name: "réservation",
+            startDate: "2024-06-01",
+            endDate: "2024-06-02"
+        });
+    });
+
+    // Peut-être un peu moins utile ce test mais je me suis dit que c'était peut-être mieux de vérifier au cas où
+    test("When the booking is valid and Start date is juste after the previous endDate",() => {
+        const booking = makeBooking();
+        booking.localStorage.addBooking.mockReturnValue([
+            { id: 1, name: "existe deja", startDate: "2024-06-01", endDate: "2024-06-02" }
+        ]);
+
+        expect(() => addBooking({
+            id: 2,
+            name: "nouveau",
+            startDate: "2024-06-02",
+            endDate: "2024-06-03"
+        }, booking.localStorage)).not.toThrow();
+    })
+
+    // Cas bloquant 
+        test("When the localStorage doesn't respond ",() => {
+        const booking = makeBooking();
+        booking.localStorage.addBooking.mockRejectedValue();
+        expect(() => addBooking({
+            id: 2,
+            name: "nouveau",
+            startDate: "2024-06-02",
+            endDate: "2024-06-03"
+        }, booking.localStorage)).toThrow(new ServiceError("Localstorage doesn't respond"));   
+    })
 });
