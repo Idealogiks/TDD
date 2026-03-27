@@ -54,4 +54,18 @@ function deleteBooking(bookingId, localStorage) {
     localStorage.deleteBooking(bookingId);
 }
 
-module.exports = { addBooking, deleteBooking };
+function searchBookingByDate(date, localStorage) {
+    if (isNaN(Date.parse(date))) {
+        throw new ValidationError("Date is not valid");
+    }
+
+    const existingBookings = localStorage.getBookings();
+    return existingBookings.filter(booking => {
+        const startDate = new Date(booking.startDate);
+        const endDate = new Date(booking.endDate);
+        return date >= startDate && date <= endDate;
+    });
+}
+
+
+module.exports = { addBooking, deleteBooking, searchBookingByDate };
