@@ -59,11 +59,10 @@ describe("Given i try to add a booking", () => {
         }, booking.localStorage)).toThrow(new ValidationError("End date cannot be before the start date"));
     });
 
-    /*
     test("When the booking is at the same time as another booking", () => {
         const booking = makeBooking();
         booking.localStorage.getBookings = jest.fn().mockReturnValue([
-            { id: 1, name: "existe deja", startDate: "2024-06-01", endDate: "2024-06-02" }
+            { id: 1, name: "existe deja", startDate: "2024-06-01", endDate: "2024-06-03" }
         ]);
 
         expect(() => addBooking({
@@ -73,7 +72,6 @@ describe("Given i try to add a booking", () => {
             endDate: "2024-06-04"
         }, booking.localStorage)).toThrow(new ValidationError("Booking conflicts with an existing booking"));
     });
-    */
 
     //Cas passants 
     test("When the booking is valid", () => {
