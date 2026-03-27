@@ -16,6 +16,10 @@ function addBooking(booking, localStorage){
     if (!booking.endDate) {
         throw new ValidationError("Booking must have an end date");
     }
+
+    if (new Date(booking.endDate) < new Date(booking.startDate)) {
+        throw new ValidationError("End date cannot be before the start date");
+    }
 }
 
 
