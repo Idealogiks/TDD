@@ -27,6 +27,12 @@ function addBooking(booking, localStorage){
             throw new ValidationError("Booking conflicts with an existing booking");
         }
     }
+
+    try {
+        localStorage.addBooking(booking);
+    } catch (e) {
+        throw new ServiceError("Localstorage doesn't respond");
+    }
 }
 
 
