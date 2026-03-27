@@ -174,4 +174,38 @@ describe("Given I try to search an booking by date" , () => {
             { id: 1, name: "réservation", startDate: "2024-06-01", endDate: "2024-06-03" }
         ]);
     });
+
+    test("When there is no booking at this date", () => {
+        const booking = makeBooking();
+        const date = new Date("2024-07-01");
+        booking.localStorage.getBookings.mockReturnValue([
+            { id: 1, name: "réservation", startDate: "2024-06-01", endDate: "2024-06-03" }
+        ]);
+        const result = searchBookingByDate(date, booking.localStorage);
+        expect(result).toHaveLength(0);
+    });
+
+    test("When the date is exactly the start date of a booking", () => {
+        const booking = makeBooking();
+        const date = new Date("2024-06-01");
+        booking.localStorage.getBookings.mockReturnValue([
+            { id: 1, name: "réservation", startDate: "2024-06-01", endDate: "2024-06-03" }
+        ]);
+        const result = searchBookingByDate(date, booking.localStorage);
+        expect(result).toContainEqual(
+            { id: 1, name: "réservation", startDate: "2024-06-01", endDate: "2024-06-03" }
+        );
+    });
+
+    test("When the date is exactly the end date of a booking", () => {
+        const booking = makeBooking();
+        const date = new Date("2024-06-03");
+        booking.localStorage.getBookings.mockReturnValue([
+            { id: 1, name: "réservation", startDate: "2024-06-01", endDate: "2024-06-03" }
+        ]);
+        const result = searchBookingByDate(date, booking.localStorage);
+        expect(result).toContainEqual(
+            { id: 1, name: "réservation", startDate: "2024-06-01", endDate: "2024-06-03" }
+        );
+    });
 })
