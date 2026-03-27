@@ -17,13 +17,13 @@ function addBooking(booking, localStorage){
         throw new ValidationError("Booking must have an end date");
     }
 
-    if (new Date(booking.endDate) < new Date(booking.startDate)) {
+    if (Date.parse(booking.endDate) < Date.parse(booking.startDate)) {
         throw new ValidationError("End date cannot be before the start date");
     }
 
     const existingBookings = localStorage.getBookings();
     for (const existing of existingBookings) {
-        if ( new Date(booking.startDate) < new Date(existing.endDate) && new Date(booking.endDate) > new Date(existing.startDate)) {
+        if ( Date.parse(booking.startDate) < Date.parse(existing.endDate) && Date.parse(booking.endDate) > Date.parse(existing.startDate)) {
             throw new ValidationError("Booking conflicts with an existing booking");
         }
     }
@@ -44,10 +44,8 @@ function deleteBooking(bookingId, localStorage) {
     }
 
     const booking = existingBookings[ListBookings];
-    const now = new Date();
-    const startDate = new Date(booking.startDate);
 
-    if (startDate - now < 48 * 60 * 60 * 1000) {
+    if (Date.parse(booking.startDate) - Date.now() < 48 * 60 * 60 * 1000) {
         throw new ValidationError("Cannot delete a booking that starts in less than 48h");
     }
 
@@ -59,12 +57,12 @@ function searchBookingByDate(date, localStorage) {
         throw new ValidationError("Date is not valid");
     }
 
+    const searchTime = Date.parse(date);
     const existingBookings = localStorage.getBookings();
-    return existingBookings.filter(booking => {
-        const startDate = new Date(booking.startDate);
-        const endDate = new Date(booking.endDate);
-        return date >= startDate && date <= endDate;
-    });
+    return existingBookings.filter(booking =>
+        searchTime >= Date.parse(booking.startDate) &&
+        searchTime <= Date.parse(booking.endDate)
+    );
 }
 
 
