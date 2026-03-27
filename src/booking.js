@@ -37,13 +37,13 @@ function addBooking(booking, localStorage){
 
 function deleteBooking(bookingId, localStorage) {
     const existingBookings = localStorage.getBookings();
-    const ListBookings = existingBookings.findIndex(b => b.id === bookingId);
+    const bookingIndex = existingBookings.findIndex(b => b.id === bookingId);
 
-    if (ListBookings === -1) {
+    if (bookingIndex === -1) {
         throw new ValidationError("Booking with this id does not exist");
     }
 
-    const booking = existingBookings[ListBookings];
+    const booking = existingBookings[bookingIndex];
 
     if (Date.parse(booking.startDate) - Date.now() < 48 * 60 * 60 * 1000) {
         throw new ValidationError("Cannot delete a booking that starts in less than 48h");
