@@ -91,10 +91,10 @@ describe("Given i try to add a booking", () => {
         });
     });
 
-    // Peut-être un peu moins utile ce test mais je me suis dit que c'était peut-être mieux de vérifier au cas où
+    // Peut-être un peu moins utile ce test mais je me suis dit que c'était peut-être mieux de vérifier au cas où, pour un cas limite
     test("When the booking is valid and Start date is juste after the previous endDate",() => {
         const booking = makeBooking();
-        booking.localStorage.addBooking.mockReturnValue([
+        booking.localStorage.getBookings.mockReturnValue([ 
             { id: 1, name: "existe deja", startDate: "2024-06-01", endDate: "2024-06-02" }
         ]);
 
