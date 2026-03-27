@@ -33,6 +33,8 @@ function addBooking(booking, localStorage){
     } catch (e) {
         throw new ServiceError("Localstorage doesn't respond");
     }
+
+    localStorage.addBooking(booking);
 }
 
 
