@@ -1,11 +1,12 @@
-const { addBooking } = require("../src/booking");
+const { addBooking, deleteBooking } = require("../src/booking");
 const { ServiceError, ValidationError } = require("../errors");
 
 function makeBooking() {
     return {
         localStorage: {
             addBooking: jest.fn(),
-            getBookings: jest.fn().mockReturnValue([])
+            getBookings: jest.fn().mockReturnValue([]), 
+            deleteBooking: jest.fn()
         },
     };
 }
@@ -121,3 +122,39 @@ describe("Given i try to add a booking", () => {
     })
     */
 });
+
+describe("Given i try to delete a booking", () => {
+    // Cas non passants
+    test("When the booking id does not exist", () => {
+        const booking = makeBooking();
+        expect(() => deleteBooking(
+            1, booking.localStorage
+        )).toThrow(new ValidationError("Booking with this id does not exist"));
+    });
+
+    test("When i try to delete a booking and reservation is in less than 48h", () => {
+        const booking = makeBooking();
+        const now = new Date();
+        const startDate = new Date(now.getTime() + 48 * 60 * 60 * 1000);
+        const endDate = new Date(now.getTime() + 50 * 60 * 60 * 1000); 
+        booking.localStorage.getBookings.mockReturnValue([
+            { id: 1, name: "existe deja", startDate: startDate.toISOString(), endDate: endDate.toISOString() }
+        ]);
+        expect(() => deleteBooking(1, booking.localStorage)).toThrow(new ValidationError("Cannot delete a booking that starts in less than 48h"));
+    });
+
+    // Cas passants
+    test("When the booking id exist and reservation is in more than 48h", () => {
+        const booking = makeBooking();
+        const now = new Date();
+        const startDate = new Date(now.getTime() + 49 * 60 * 60 * 1000);
+        const endDate = new Date(now.getTime() + 50 * 60 * 60 * 1000); 
+        booking.localStorage.getBookings.mockReturnValue([
+            { id: 1, name: "existe deja", startDate: startDate.toISOString(), endDate: endDate.toISOString() }
+        ]);
+        deleteBooking(1, booking.localStorage);
+        expect(booking.localStorage.deleteBooking).toHaveBeenCalledWith(1);
+    });
+
+    // Cas bloquants
+})
